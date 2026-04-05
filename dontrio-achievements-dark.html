@@ -359,31 +359,17 @@
   let totalViewers = 0;
 
   // ── FETCH DATA ─────────────────────────────────────────────────
-  async function loadData() {
+ async function loadData() {
     if (SHEET_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
       useDummyData();
       return;
     }
 
-    try {
-      const res = await fetch(SHEET_URL + '?action=getAllData', {
-        method: 'GET',
-        mode: 'no-cors',
-        redirect: 'follow'
-      });
-
-      // no-cors means we can't read the response directly
-      // so we use a script tag approach instead
-      loadViaScript();
-    } catch(err) {
-      console.error('Failed:', err);
-      useDummyData();
-    }
-  }
-
-  function loadViaScript() {
     window.handleSheetData = function(data) {
-      if (data.status !== 'ok') { useDummyData(); return; }
+      if (!data || data.status !== 'ok') {
+        useDummyData();
+        return;
+      }
       allAchievements = data.achievements;
       allViewers = data.viewers;
       totalViewers = allViewers.length;
@@ -394,6 +380,14 @@
     script.src = SHEET_URL + '?action=getAllData&callback=handleSheetData';
     script.onerror = () => useDummyData();
     document.head.appendChild(script);
+
+    // Fallback if callback never fires after 8 seconds
+    setTimeout(() => {
+      if (document.getElementById('loading').style.display !== 'none') {
+        console.warn('Sheet fetch timed out, using dummy data');
+        useDummyData();
+      }
+    }, 8000);
   }
 
   // ── DUMMY DATA (used until URL is configured) ──────────────────
