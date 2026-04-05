@@ -365,22 +365,21 @@
       return;
     }
 
-    try {
-      const url = SHEET_URL + '?action=getAllData';
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      if (data.status !== 'ok') throw new Error('Bad response');
+    window.handleSheetData = function(data) {
+      if (!data || data.status !== 'ok') {
+        useDummyData();
+        return;
+      }
       allAchievements = data.achievements;
       allViewers = data.viewers;
       totalViewers = allViewers.length;
       renderAll();
-    } catch(err) {
-      console.error('Fetch failed:', err);
-      useDummyData();
-    }
+    };
+
+    const script = document.createElement('script');
+    script.src = SHEET_URL + '?action=getAllData&callback=handleSheetData';
+    script.onerror = () => useDummyData();
+    document.head.appendChild(script);
   }
 
   // ── DUMMY DATA (used until URL is configured) ──────────────────
@@ -458,14 +457,12 @@
   }
 
   // ── LEADERBOARD ────────────────────────────────────────────────
-  function buildLeaderboard() {
+function buildLeaderboard() {
     const sorted = [...allViewers].sort((a,b) => b.earned.length - a.earned.length).slice(0,10);
     const max = sorted[0]?.earned.length || 1;
     const medals = ['🥇','🥈','🥉'];
 
-    document.getElementById('leaderboard').innerHTML = sorted.map(([v,i] = [null,0], idx) => {
-      // Handle both array destructuring and direct access
-      const viewer = sorted[idx];
+    document.getElementById('leaderboard').innerHTML = sorted.map((viewer, idx) => {
       const count = viewer.earned.length;
       const icons = viewer.earned.slice(0,5).map(col => {
         const ach = allAchievements.find(a => a.col === col);
