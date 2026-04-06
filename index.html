@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DonTrio — Achievements</title>
+<title>DonTrio — Achievement Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -11,188 +11,349 @@
     --bg:#0a0a0c; --bg2:#111116; --bg3:#1a1a22;
     --border:rgba(227,0,11,0.25); --text:#e8e8f0; --muted:#6b6b80;
     --earned:#1a2a1a; --earned-border:rgba(80,200,80,0.4); --earned-text:#6dda6d;
+    --pin-gold:rgba(245,197,24,0.15); --pin-border:rgba(245,197,24,0.4);
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
 
-  body {
-    background:var(--bg); color:var(--text);
+  body{
+    background:var(--bg);color:var(--text);
     font-family:'Rajdhani',sans-serif;
-    min-height:100vh; overflow-x:hidden;
+    min-height:100vh;overflow-x:hidden;
   }
 
-  body::before {
-    content:''; position:fixed; inset:0;
+  body::before{
+    content:'';position:fixed;inset:0;
     background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
-    pointer-events:none; z-index:999;
+    pointer-events:none;z-index:999;
   }
 
-  .bg-grid {
-    position:fixed; inset:0;
-    background-image:linear-gradient(rgba(227,0,11,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(227,0,11,0.04) 1px,transparent 1px);
+  .bg-grid{
+    position:fixed;inset:0;
+    background-image:linear-gradient(rgba(227,0,11,0.04) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(227,0,11,0.04) 1px,transparent 1px);
     background-size:40px 40px;
-    animation:gridDrift 20s linear infinite; pointer-events:none;
+    animation:gridDrift 20s linear infinite;pointer-events:none;
   }
 
-  @keyframes gridDrift { 0%{transform:translate(0,0)} 100%{transform:translate(40px,40px)} }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes gridDrift{0%{transform:translate(0,0)}100%{transform:translate(40px,40px)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(227,0,11,0.4)}50%{box-shadow:0 0 0 12px rgba(227,0,11,0)}}
+  @keyframes searchGlow{0%,100%{box-shadow:0 0 0 0 rgba(227,0,11,0)}50%{box-shadow:0 0 20px 4px rgba(227,0,11,0.3)}}
 
   /* ── HEADER ── */
-  header {
-    position:relative; padding:60px 40px 40px; text-align:center;
+  header{
+    position:relative;padding:60px 40px 50px;text-align:center;
     border-bottom:1px solid var(--border);
     background:linear-gradient(180deg,rgba(227,0,11,0.08) 0%,transparent 100%);
   }
 
-  .logo-eyebrow { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:6px; color:var(--red); text-transform:uppercase; margin-bottom:12px; opacity:0; animation:fadeUp .6s .2s forwards; }
-  .logo { font-family:'Bebas Neue',sans-serif; font-size:clamp(64px,12vw,120px); line-height:.9; letter-spacing:4px; background:linear-gradient(180deg,#fff 0%,#ccc 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; opacity:0; animation:fadeUp .6s .35s forwards; }
-  .logo span { background:linear-gradient(180deg,var(--red) 0%,var(--red-dim) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .logo-sub { font-family:'Bebas Neue',sans-serif; font-size:clamp(18px,4vw,28px); letter-spacing:12px; color:var(--muted); margin-top:8px; opacity:0; animation:fadeUp .6s .5s forwards; }
-  .header-line { width:120px; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); margin:24px auto 0; opacity:0; animation:fadeUp .6s .65s forwards; }
+  .logo-eyebrow{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:6px;color:var(--red);text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeUp .6s .2s forwards}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,12vw,120px);line-height:.9;letter-spacing:4px;background:linear-gradient(180deg,#fff 0%,#ccc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;animation:fadeUp .6s .35s forwards}
+  .logo span{background:linear-gradient(180deg,var(--red) 0%,var(--red-dim) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .logo-sub{font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,4vw,28px);letter-spacing:12px;color:var(--muted);margin-top:8px;opacity:0;animation:fadeUp .6s .5s forwards}
+  .header-line{width:120px;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);margin:24px auto 0;opacity:0;animation:fadeUp .6s .65s forwards}
 
-  /* ── STATS BAR ── */
-  .stats-bar { display:flex; justify-content:center; gap:60px; padding:28px 40px; border-bottom:1px solid var(--border); background:var(--bg2); flex-wrap:wrap; }
-  .stat { text-align:center; }
-  .stat-number { font-family:'Bebas Neue',sans-serif; font-size:42px; color:var(--red); line-height:1; }
-  .stat-label { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
+  /* ── STATS ── */
+  .stats-bar{display:flex;justify-content:center;gap:60px;padding:28px 40px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
+  .stat{text-align:center}
+  .stat-number{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--red);line-height:1}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+
+  /* ── HERO SEARCH ── */
+  #hero-search{
+    padding:60px 40px 70px;text-align:center;
+    background:linear-gradient(180deg,rgba(227,0,11,0.04) 0%,transparent 100%);
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+
+  .hero-search-label{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(28px,5vw,48px);
+    letter-spacing:4px;color:var(--text);
+    margin-bottom:8px;
+  }
+
+  .hero-search-sub{
+    font-family:'Share Tech Mono',monospace;
+    font-size:12px;letter-spacing:4px;
+    color:var(--muted);text-transform:uppercase;
+    margin-bottom:36px;
+  }
+
+  .search-wrap{
+    display:flex;align-items:stretch;
+    max-width:600px;margin:0 auto;
+    gap:0;position:relative;
+  }
+
+  .search-wrap::before{
+    content:'';
+    position:absolute;inset:-3px;
+    background:linear-gradient(90deg,var(--red-dim),var(--red),var(--red-dim));
+    border-radius:0;opacity:0;
+    animation:searchGlow 2s ease-in-out infinite;
+    pointer-events:none;z-index:0;
+  }
+
+  #hero-input{
+    flex:1;
+    background:var(--bg2);
+    border:2px solid var(--red);
+    border-right:none;
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    font-size:18px;font-weight:600;
+    padding:16px 20px;
+    outline:none;
+    position:relative;z-index:1;
+    transition:background .2s;
+  }
+
+  #hero-input:focus{background:var(--bg3);}
+  #hero-input::placeholder{color:var(--muted);font-weight:400}
+
+  #hero-btn{
+    background:var(--red);color:white;border:2px solid var(--red);
+    font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;
+    padding:16px 32px;cursor:pointer;
+    transition:background .2s;white-space:nowrap;
+    position:relative;z-index:1;
+  }
+
+  #hero-btn:hover{background:#ff1a24}
+
+  .viewer-status{
+    margin-top:20px;min-height:28px;
+    font-family:'Share Tech Mono',monospace;
+    font-size:12px;letter-spacing:3px;
+    text-transform:uppercase;
+  }
+
+  .viewer-status.found{color:var(--earned-text)}
+  .viewer-status.not-found{color:var(--red)}
+
+  /* ── FILTER BAR ── */
+  #filter-bar{
+    display:none;
+    background:var(--bg2);border-bottom:1px solid var(--border);
+    padding:16px 40px;
+    align-items:center;justify-content:center;
+    gap:12px;flex-wrap:wrap;
+    position:sticky;top:0;z-index:50;
+  }
+
+  #filter-bar.visible{display:flex}
+
+  .filter-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-right:4px}
+
+  .filter-btn{
+    background:var(--bg3);border:1px solid var(--border);
+    color:var(--muted);
+    font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;
+    padding:7px 16px;cursor:pointer;transition:all .2s;
+    text-transform:uppercase;
+  }
+
+  .filter-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+  .filter-btn.active{background:rgba(227,0,11,0.2);border-color:var(--red);color:var(--red)}
+  .filter-btn.pin-active{background:var(--pin-gold);border-color:var(--pin-border);color:var(--gold)}
+
+  .filter-divider{width:1px;height:24px;background:var(--border)}
+
+  .viewer-tag{
+    font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;
+    color:var(--earned-text);background:rgba(80,200,80,0.1);
+    border:1px solid var(--earned-border);padding:7px 14px;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  .viewer-tag button{
+    background:none;border:none;color:var(--earned-text);
+    cursor:pointer;font-size:14px;line-height:1;padding:0;
+  }
 
   /* ── LOADING ── */
-  #loading {
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:100px 40px; gap:20px;
-  }
-
-  .spinner {
-    width:40px; height:40px; border-radius:50%;
-    border:3px solid rgba(227,0,11,0.2);
-    border-top-color:var(--red);
-    animation:spin 0.8s linear infinite;
-  }
-
-  .loading-text { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; }
-
-  /* ── ERROR ── */
-  #error-msg { display:none; text-align:center; padding:60px 40px; }
-  .error-text { font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:3px; color:var(--red); text-transform:uppercase; }
+  #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px;gap:20px}
+  .spinner{width:40px;height:40px;border-radius:50%;border:3px solid rgba(227,0,11,0.2);border-top-color:var(--red);animation:spin .8s linear infinite}
+  .loading-text{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase}
 
   /* ── MAIN ── */
-  main { max-width:1200px; margin:0 auto; padding:50px 24px 80px; display:none; }
-
-  /* ── SECTION HEADERS ── */
-  .section-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; margin-top:56px; }
-  .section-header:first-of-type { margin-top:0; }
-  .section-tag { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:4px; color:var(--red); background:rgba(227,0,11,0.1); border:1px solid var(--border); padding:4px 10px; text-transform:uppercase; }
-  .section-line { flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
-  .section-title { font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:3px; color:var(--text); margin-bottom:6px; }
-
-  /* ── VIEWER SEARCH ── */
-  .viewer-bar { background:var(--bg2); border:1px solid var(--border); padding:20px 24px; margin-bottom:40px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-  .viewer-label { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
-  .viewer-input { flex:1; min-width:200px; background:var(--bg3); border:1px solid var(--border); color:var(--text); font-family:'Share Tech Mono',monospace; font-size:13px; padding:10px 14px; outline:none; transition:border-color .2s; }
-  .viewer-input:focus { border-color:var(--red); }
-  .viewer-input::placeholder { color:var(--muted); }
-  .viewer-btn { background:var(--red); color:white; border:none; font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:2px; padding:10px 24px; cursor:pointer; transition:background .2s; white-space:nowrap; }
-  .viewer-btn:hover { background:#ff1a24; }
+  main{max-width:1300px;margin:0 auto;padding:50px 24px 120px;display:none}
 
   /* ── LEADERBOARD ── */
-  .leaderboard { display:flex; flex-direction:column; gap:10px; }
-  .lb-row { display:flex; align-items:center; gap:16px; background:var(--bg2); border:1px solid var(--border); padding:14px 20px; position:relative; overflow:hidden; transition:all .2s; }
-  .lb-row:hover { border-color:rgba(227,0,11,0.5); background:var(--bg3); }
-  .lb-row.top-1 { border-color:rgba(245,197,24,0.5); }
-  .lb-row.top-2 { border-color:rgba(192,192,192,0.4); }
-  .lb-row.top-3 { border-color:rgba(205,127,50,0.4); }
-  .lb-bar { position:absolute; left:0; top:0; bottom:0; background:rgba(227,0,11,0.06); pointer-events:none; }
-  .lb-row.top-1 .lb-bar { background:rgba(245,197,24,0.08); }
-  .lb-rank { font-family:'Bebas Neue',sans-serif; font-size:26px; width:44px; text-align:center; position:relative; z-index:1; flex-shrink:0; color:var(--muted); }
-  .lb-row.top-1 .lb-rank { color:var(--gold); }
-  .lb-row.top-2 .lb-rank { color:#c0c0c0; }
-  .lb-row.top-3 .lb-rank { color:#cd7f32; }
-  .lb-name { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; position:relative; z-index:1; flex:1; }
-  .lb-badges { display:flex; gap:4px; position:relative; z-index:1; flex-wrap:wrap; }
-  .lb-badge { font-size:14px; }
-  .lb-count { position:relative; z-index:1; text-align:right; white-space:nowrap; }
-  .lb-count strong { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--red); display:block; line-height:1; }
-  .lb-count span { font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; }
+  .leaderboard{display:flex;flex-direction:column;gap:10px;margin-bottom:60px}
+  .lb-row{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);padding:14px 20px;position:relative;overflow:hidden;transition:all .2s}
+  .lb-row:hover{border-color:rgba(227,0,11,0.5);background:var(--bg3)}
+  .lb-row.top-1{border-color:rgba(245,197,24,0.5)}
+  .lb-row.top-2{border-color:rgba(192,192,192,0.4)}
+  .lb-row.top-3{border-color:rgba(205,127,50,0.4)}
+  .lb-bar{position:absolute;left:0;top:0;bottom:0;background:rgba(227,0,11,0.06);pointer-events:none}
+  .lb-row.top-1 .lb-bar{background:rgba(245,197,24,0.08)}
+  .lb-rank{font-family:'Bebas Neue',sans-serif;font-size:26px;width:44px;text-align:center;position:relative;z-index:1;flex-shrink:0;color:var(--muted)}
+  .lb-row.top-1 .lb-rank{color:var(--gold)}
+  .lb-row.top-2 .lb-rank{color:#c0c0c0}
+  .lb-row.top-3 .lb-rank{color:#cd7f32}
+  .lb-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;position:relative;z-index:1;flex:1}
+  .lb-badges{display:flex;gap:4px;position:relative;z-index:1;flex-wrap:wrap}
+  .lb-badge{font-size:14px}
+  .lb-count{position:relative;z-index:1;text-align:right;white-space:nowrap}
+  .lb-count strong{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--red);display:block;line-height:1}
+  .lb-count span{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
+
+  /* ── SECTION HEADERS ── */
+  .section-header{display:flex;align-items:center;gap:16px;margin-bottom:24px;margin-top:56px}
+  .section-header:first-of-type{margin-top:0}
+  .section-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--red);background:rgba(227,0,11,0.1);border:1px solid var(--border);padding:4px 10px;text-transform:uppercase;white-space:nowrap}
+  .section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;color:var(--text)}
+  .section-count{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted)}
 
   /* ── ACHIEVEMENT GRID ── */
-  .achievement-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
-  .ach-card { background:var(--bg2); border:1px solid var(--border); padding:20px; position:relative; transition:all .2s; cursor:pointer; overflow:hidden; }
-  .ach-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--red),transparent); opacity:0; transition:opacity .2s; }
-  .ach-card:hover { border-color:var(--red); background:var(--bg3); transform:translateY(-2px); box-shadow:0 8px 30px rgba(227,0,11,0.15); }
-  .ach-card:hover::before { opacity:1; }
-  .ach-card.earned { background:var(--earned); border-color:var(--earned-border); }
-  .ach-card.earned::before { background:linear-gradient(90deg,transparent,var(--earned-text),transparent); opacity:1; }
-  .ach-icon { font-size:28px; margin-bottom:10px; display:block; }
-  .ach-name { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; color:var(--text); margin-bottom:6px; }
-  .ach-card.earned .ach-name { color:var(--earned-text); }
-  .ach-desc { font-size:13px; color:var(--muted); line-height:1.5; font-weight:500; margin-bottom:10px; }
-  .ach-footer { display:flex; align-items:center; justify-content:space-between; margin-top:8px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05); }
-  .ach-unlocked { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--muted); }
-  .ach-unlocked span { color:var(--red); }
-  .ach-click-hint { font-family:'Share Tech Mono',monospace; font-size:9px; color:rgba(255,255,255,0.18); letter-spacing:1px; }
-  .earned-badge { position:absolute; top:14px; right:14px; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--earned-text); background:rgba(80,200,80,0.1); border:1px solid var(--earned-border); padding:3px 7px; text-transform:uppercase; }
+  .achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:20px}
 
-  /* ── GYM GRID ── */
-  .gym-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
-  .gym-card { background:var(--bg2); border:1px solid var(--border); padding:16px; text-align:center; transition:all .2s; }
-  .gym-card.beaten { background:var(--earned); border-color:var(--earned-border); }
-  .gym-card:hover { border-color:rgba(227,0,11,0.5); transform:translateY(-2px); }
-  .gym-badge-icon { font-size:32px; margin-bottom:8px; display:block; filter:grayscale(1) opacity(.35); transition:filter .3s; }
-  .gym-card.beaten .gym-badge-icon { filter:none; }
-  .gym-set { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px; }
-  .gym-name { font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:1px; color:var(--text); }
-  .gym-card.beaten .gym-name { color:var(--earned-text); }
-  .gym-sub-label { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; margin-top:28px; }
+  .ach-card{
+    background:var(--bg2);border:1px solid var(--border);
+    padding:18px;position:relative;
+    transition:all .2s;cursor:pointer;overflow:hidden;
+  }
 
-  /* ── COMMUNAL ── */
-  .communal-card { background:var(--bg2); border:1px solid var(--border); padding:24px 28px; margin-bottom:16px; position:relative; overflow:hidden; }
-  .communal-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:10px; flex-wrap:wrap; }
-  .communal-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; margin-bottom:4px; }
-  .communal-desc { font-size:13px; color:var(--muted); font-weight:500; margin-bottom:16px; }
-  .communal-pct { font-family:'Bebas Neue',sans-serif; font-size:38px; color:var(--red); line-height:1; white-space:nowrap; }
-  .progress-bar { height:6px; background:rgba(255,255,255,0.06); position:relative; overflow:hidden; }
-  .progress-fill { height:100%; background:linear-gradient(90deg,var(--red-dim),var(--red)); position:relative; }
-  .progress-fill::after { content:''; position:absolute; right:0; top:0; bottom:0; width:20px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.3)); animation:shimmer 1.5s ease-in-out infinite; }
-  @keyframes shimmer { 0%,100%{opacity:0} 50%{opacity:1} }
-  .progress-meta { display:flex; justify-content:space-between; margin-top:8px; font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; }
+  .ach-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;transition:opacity .2s}
+  .ach-card:hover{border-color:var(--red);background:var(--bg3);transform:translateY(-2px);box-shadow:0 8px 30px rgba(227,0,11,0.15)}
+  .ach-card:hover::before{opacity:1}
+
+  .ach-card.earned{background:var(--earned);border-color:var(--earned-border)}
+  .ach-card.earned::before{background:linear-gradient(90deg,transparent,var(--earned-text),transparent);opacity:1}
+
+  .ach-card.has-pin{border-color:rgba(245,197,24,0.25)}
+  .ach-card.has-pin:hover{border-color:rgba(245,197,24,0.6);box-shadow:0 8px 30px rgba(245,197,24,0.1)}
+  .ach-card.has-pin::before{background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+  .ach-card.earned.has-pin{background:linear-gradient(135deg,var(--earned) 60%,rgba(40,30,0,0.8));border-color:var(--gold)}
+  .ach-card.earned.has-pin::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:1}
+
+  .ach-card.hidden-card{display:none}
+
+  .ach-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+  .ach-icon{font-size:26px;flex-shrink:0}
+
+  .ach-badges{display:flex;gap:6px;align-items:center}
+
+  .pin-indicator{
+    font-size:11px;
+    background:var(--pin-gold);
+    border:1px solid var(--pin-border);
+    color:var(--gold);
+    padding:2px 8px;
+    font-family:'Share Tech Mono',monospace;
+    letter-spacing:1px;
+    white-space:nowrap;
+  }
+
+  .earned-badge{
+    font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;
+    color:var(--earned-text);background:rgba(80,200,80,0.1);
+    border:1px solid var(--earned-border);padding:2px 7px;text-transform:uppercase;
+  }
+
+  .ach-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;color:var(--text);margin-bottom:5px}
+  .ach-card.earned .ach-name{color:var(--earned-text)}
+  .ach-card.earned.has-pin .ach-name{color:var(--gold)}
+
+  .ach-desc{font-size:12px;color:var(--muted);line-height:1.5;font-weight:500;margin-bottom:10px}
+
+  .ach-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)}
+  .ach-unlocked{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted)}
+  .ach-unlocked span{color:var(--red)}
+  .ach-click-hint{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.18);letter-spacing:1px}
+
+  /* ── EMPTY STATE ── */
+  .empty-state{
+    text-align:center;padding:40px;
+    font-family:'Share Tech Mono',monospace;font-size:11px;
+    letter-spacing:3px;color:var(--muted);text-transform:uppercase;
+  }
+
+  /* ── BACK TO TOP BUTTON ── */
+  #back-to-search{
+    position:fixed;bottom:30px;right:30px;
+    background:var(--red);color:white;border:none;
+    font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;
+    padding:14px 24px;cursor:pointer;
+    transition:all .2s;z-index:100;
+    box-shadow:0 4px 20px rgba(227,0,11,0.4);
+    display:none;
+  }
+
+  #back-to-search:hover{background:#ff1a24;transform:translateY(-2px);box-shadow:0 6px 24px rgba(227,0,11,0.5)}
+  #back-to-search.visible{display:block}
 
   /* ── MODAL ── */
-  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .2s; backdrop-filter:blur(6px); }
-  .modal-overlay.open { opacity:1; pointer-events:all; }
-  .modal { background:var(--bg2); border:1px solid var(--border); max-width:500px; width:100%; position:relative; transform:translateY(24px); transition:transform .25s; }
-  .modal-overlay.open .modal { transform:translateY(0); }
-  .modal-top-bar { height:3px; background:linear-gradient(90deg,var(--red-dim),var(--red),var(--red-dim)); }
-  .modal-body { padding:30px; }
-  .modal-icon { font-size:48px; margin-bottom:10px; display:block; }
-  .modal-rarity { display:inline-block; font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; padding:3px 10px; text-transform:uppercase; margin-bottom:12px; }
-  .rarity-rare { color:var(--gold); border:1px solid rgba(245,197,24,0.3); background:rgba(245,197,24,0.06); }
-  .rarity-common { color:#6b9fff; border:1px solid rgba(107,159,255,0.3); background:rgba(107,159,255,0.05); }
-  .modal-name { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:2px; color:var(--text); margin-bottom:8px; }
-  .modal-desc { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:24px; font-weight:500; }
-  .modal-stats { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:22px; }
-  .modal-stat { background:var(--bg3); padding:18px; text-align:center; }
-  .modal-stat-num { font-family:'Bebas Neue',sans-serif; font-size:38px; color:var(--red); line-height:1; }
-  .modal-stat-label { font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:4px; }
-  .modal-earners-title { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
-  .modal-earners { display:flex; flex-wrap:wrap; gap:8px; }
-  .modal-earner-tag { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--earned-text); background:rgba(80,200,80,0.1); border:1px solid var(--earned-border); padding:4px 10px; }
-  .modal-none { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); }
-  .modal-close { position:absolute; top:16px; right:16px; background:none; border:1px solid var(--border); color:var(--muted); font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; padding:6px 14px; cursor:pointer; transition:all .2s; text-transform:uppercase; }
-  .modal-close:hover { border-color:var(--red); color:var(--red); }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(6px)}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .modal{background:var(--bg2);border:1px solid var(--border);max-width:520px;width:100%;position:relative;transform:translateY(24px);transition:transform .25s;max-height:90vh;overflow-y:auto}
+  .modal-overlay.open .modal{transform:translateY(0)}
+  .modal-top-bar{height:3px;background:linear-gradient(90deg,var(--red-dim),var(--red),var(--red-dim));position:sticky;top:0}
+  .modal-top-bar.gold-bar{background:linear-gradient(90deg,#8a6000,var(--gold),#8a6000)}
+  .modal-body{padding:28px}
+  .modal-icon{font-size:44px;margin-bottom:8px;display:block}
+  .modal-rarity{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;padding:3px 10px;text-transform:uppercase;margin-bottom:10px}
+  .rarity-rare{color:var(--gold);border:1px solid rgba(245,197,24,0.3);background:rgba(245,197,24,0.06)}
+  .rarity-common{color:#6b9fff;border:1px solid rgba(107,159,255,0.3);background:rgba(107,159,255,0.05)}
+  .modal-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--text);margin-bottom:6px}
+  .modal-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;font-weight:500}
+
+  /* Pin preview in modal */
+  .modal-pin-preview{
+    background:var(--pin-gold);border:1px solid var(--pin-border);
+    padding:20px;text-align:center;margin-bottom:20px;
+  }
+  .modal-pin-preview img{max-height:140px;max-width:200px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(245,197,24,0.4))}
+  .modal-pin-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:10px}
+  .modal-pin-missing{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(245,197,24,0.5);text-transform:uppercase;padding:20px}
+
+  .modal-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:20px}
+  .modal-stat{background:var(--bg3);padding:16px;text-align:center}
+  .modal-stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);line-height:1}
+  .modal-stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+  .modal-earners-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+  .modal-earners{display:flex;flex-wrap:wrap;gap:8px}
+  .modal-earner-tag{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--earned-text);background:rgba(80,200,80,0.1);border:1px solid var(--earned-border);padding:4px 10px}
+  .modal-none{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted)}
+  .modal-close{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:5px 12px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+  .modal-close:hover{border-color:var(--red);color:var(--red)}
+
+  /* ── COMMUNAL ── */
+  .communal-card{background:var(--bg2);border:1px solid var(--border);padding:22px 26px;margin-bottom:14px}
+  .communal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+  .communal-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:3px}
+  .communal-desc{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:14px}
+  .communal-pct{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--red);line-height:1;white-space:nowrap}
+  .progress-bar{height:6px;background:rgba(255,255,255,0.06);overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--red-dim),var(--red))}
+  .progress-meta{display:flex;justify-content:space-between;margin-top:7px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px}
 
   /* ── LAST UPDATED ── */
-  .last-updated { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--muted); text-align:center; margin-top:40px; }
-  .last-updated a { color:var(--red); text-decoration:none; }
+  .last-updated{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-align:center;margin-top:40px}
 
-  footer { border-top:1px solid var(--border); padding:30px 40px; text-align:center; font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
-  footer a { color:var(--red); text-decoration:none; }
+  footer{border-top:1px solid var(--border);padding:28px 40px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+  footer a{color:var(--red);text-decoration:none}
 
-  @media(max-width:600px) { header{padding:40px 20px 30px} .stats-bar{gap:30px;padding:20px} main{padding:30px 16px 60px} }
+  @media(max-width:700px){
+    header{padding:40px 20px 36px}
+    .stats-bar{gap:24px;padding:20px}
+    #hero-search{padding:40px 20px 50px}
+    main{padding:30px 16px 100px}
+    #filter-bar{padding:12px 16px}
+  }
 </style>
 </head>
 <body>
 <div class="bg-grid"></div>
 
+<!-- HEADER -->
 <header>
   <div class="logo-eyebrow">Twitch Stream Achievements</div>
   <div class="logo">Don<span>Trio</span></div>
@@ -200,31 +361,43 @@
   <div class="header-line"></div>
 </header>
 
+<!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-number" id="s-total">—</div><div class="stat-label">Achievements</div></div>
   <div class="stat"><div class="stat-number" id="s-viewers">—</div><div class="stat-label">Active Viewers</div></div>
   <div class="stat"><div class="stat-number" id="s-earned">—</div><div class="stat-label">Total Earned</div></div>
 </div>
 
-<!-- Loading state -->
+<!-- HERO SEARCH -->
+<div id="hero-search">
+  <div class="hero-search-label">Se Dine Achievements</div>
+  <div class="hero-search-sub">Skriv dit Twitch-navn for at se dine fremskridt</div>
+  <div class="search-wrap">
+    <input id="hero-input" type="text" placeholder="Dit Twitch-navn...">
+    <button id="hero-btn" onclick="doSearch()">SØG</button>
+  </div>
+  <div class="viewer-status" id="viewer-status"></div>
+</div>
+
+<!-- FILTER BAR (sticky, shown after search or scroll) -->
+<div id="filter-bar">
+  <span class="filter-label">Vis:</span>
+  <button class="filter-btn active" id="f-all"     onclick="setFilter('all')">Alle</button>
+  <button class="filter-btn"        id="f-earned"  onclick="setFilter('earned')">Dine Achievements</button>
+  <button class="filter-btn"        id="f-missing" onclick="setFilter('missing')">Achievements du Mangler</button>
+  <div class="filter-divider"></div>
+  <button class="filter-btn"        id="f-pins"    onclick="togglePinFilter()">📌 Kun med Pin</button>
+  <div id="viewer-tag-wrap"></div>
+</div>
+
+<!-- LOADING -->
 <div id="loading">
   <div class="spinner"></div>
-  <div class="loading-text">Loading achievement data...</div>
+  <div class="loading-text">Henter achievement data...</div>
 </div>
 
-<!-- Error state -->
-<div id="error-msg">
-  <div class="error-text">Could not load data — check your connection and try again</div>
-</div>
-
-<!-- Main content (hidden until data loads) -->
+<!-- MAIN CONTENT -->
 <main id="main-content">
-
-  <div class="viewer-bar">
-    <span class="viewer-label">Find Viewer</span>
-    <input class="viewer-input" type="text" id="vsearch" placeholder="Skriv dit Twitch-navn...">
-    <button class="viewer-btn" onclick="filterViewer()">Søg</button>
-  </div>
 
   <!-- Leaderboard -->
   <div class="section-header">
@@ -234,27 +407,11 @@
   </div>
   <div class="leaderboard" id="leaderboard"></div>
 
-  <!-- Individual achievements -->
-  <div class="section-header">
-    <div><div class="section-title">Individuelle Achievements</div></div>
-    <div class="section-line"></div>
-    <div class="section-tag">Individual</div>
-  </div>
-  <div class="achievement-grid" id="ach-grid"></div>
-
-  <!-- Gym leaders -->
-  <div class="section-header">
-    <div><div class="section-title">Gym Leader Progress</div></div>
-    <div class="section-line"></div>
-    <div class="section-tag">Badges</div>
-  </div>
-  <div class="gym-sub-label">⚔ Scarlet &amp; Violet</div>
-  <div class="gym-grid" id="gym-sv"></div>
-  <div class="gym-sub-label">⚔ Mega Evolution</div>
-  <div class="gym-grid" id="gym-me"></div>
+  <!-- Achievement categories rendered dynamically -->
+  <div id="categories-container"></div>
 
   <!-- Communal -->
-  <div class="section-header">
+  <div class="section-header" id="communal-header">
     <div><div class="section-title">Fælles Achievements</div></div>
     <div class="section-line"></div>
     <div class="section-tag">Communal</div>
@@ -281,16 +438,20 @@
   <div class="last-updated" id="last-updated"></div>
 </main>
 
-<!-- Modal -->
+<!-- BACK TO SEARCH BUTTON -->
+<button id="back-to-search" onclick="scrollToSearch()">↑ Se Dine Achievements!</button>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-top-bar"></div>
+  <div class="modal" id="modal">
+    <div class="modal-top-bar" id="modal-top-bar"></div>
     <button class="modal-close" onclick="closeModalDirect()">× Luk</button>
     <div class="modal-body">
       <span class="modal-icon" id="m-icon">🏆</span>
       <div class="modal-rarity" id="m-rarity"></div>
       <div class="modal-name" id="m-name"></div>
       <div class="modal-desc" id="m-desc"></div>
+      <div id="m-pin-section"></div>
       <div class="modal-stats">
         <div class="modal-stat"><div class="modal-stat-num" id="m-count">0</div><div class="modal-stat-label">Viewers Unlocked</div></div>
         <div class="modal-stat"><div class="modal-stat-num" id="m-pct">0%</div><div class="modal-stat-label">Af Aktive Viewers</div></div>
@@ -302,77 +463,80 @@
 </div>
 
 <footer>
-  <div>DonTrio Achievement Tracker &nbsp;·&nbsp; Opdateres efter hver stream &nbsp;·&nbsp; <a href="https://twitch.tv/DonTrio_TCG" target="_blank">twitch.tv/DonTrio_TCG</a></div>
+  <div>DonTrio Achievement Tracker &nbsp;·&nbsp; Opdateres efter hver stream &nbsp;·&nbsp; <a href="https://twitch.tv/Dontrio_TCG" target="_blank">twitch.tv/Dontrio_TCG</a></div>
 </footer>
 
 <script>
   // ══════════════════════════════════════════════════════════════
-  // 🔧 CONFIGURATION — replace this URL with your own Web App URL
+  // 🔧 CONFIGURATION
   const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzrTXW7pe7uKpdH0Iepup7cCx6UcVcT6fcxx2C8iWM5C2uDWrMOCAIuNV2e6nv4aRZrIQ/exec';
+  const PINS_BASE = 'pins/'; // folder in same repo
   // ══════════════════════════════════════════════════════════════
 
-  // Achievement icons — mapped by column title keywords
+  // Category display config
+  const CATEGORY_CONFIG = {
+    'Pack Hits':  { icon:'🎯', label:'Pack Hits' },
+    'PvP':        { icon:'⚔️', label:'PvP Turneringer' },
+    'Gym Leader': { icon:'🏅', label:'Gym Leader Battles' },
+    'Sociale':    { icon:'🤝', label:'Sociale Achievements' },
+    'Other':      { icon:'⭐', label:'Andre Achievements' },
+  };
+
+  const CATEGORY_ORDER = ['Pack Hits','PvP','Gym Leader','Sociale','Other'];
+
+  // Icon map
   const ICON_MAP = {
-    'ex': '⚡', 'illustration': '🎨', 'sir': '👑', 'pink': '💗',
-    'kaching': '💰', 'hyper': '💰', 'godt': '🎁', 'mystery': '🃏',
-    'bullseye': '🎯', 'sniper': '🔫', 'robin': '🏹', 'godpack': '✨',
-    'dagens pull': '🏆', 'king': '⛰️', 'winner': '🥇', 'champion': '🏅',
-    'challenger': '⚔️', 'trainer': '🌟', 'rematch': '🔄', 'ubesejret': '🛡️',
-    'første': '🩸', 'trofast': '🔥', "alti'": '💎', 'gavmild': '🎀',
-    'sub': '📺', 'beat': '🏅', 'scarlet': '🔴', 'mega': '⚡',
-    'paldea': '🌿', 'obsidian': '🔥', '151': '🌀', 'paradox': '🌌',
-    'temporal': '⏳', 'twilight': '🌙', 'shrouded': '🌫️', 'stellar': '⭐',
-    'surging': '🌊', 'prismatic': '💎', 'journey': '🗺️', 'destined': '⚔️',
-    'phantasmal': '👻', 'ascended': '👼', 'perfect': '✅', 'black': '⬛',
-    'white': '⬜', 'david': '🪨'
+    'ex-ceptionelt':'⚡','wow den er':'🎨','yes-sir':'👑','pink star':'💗',
+    'in don we trust':'💰','kaching':'💰','et godt valg':'🎁','mystery jackpot':'🃏',
+    'bullseye':'🎯','robin hood':'🏹','sniper':'🔫','godpack':'✨','dagens pull':'🏆',
+    'king of the hill':'⛰️','welcome to the arena':'🗡️','winner-winner':'🥇',
+    'the iron throne':'👑','challenger':'⚔️','første win':'🌟','øvet':'📈',
+    'godt på vej':'🚀','en hård nyser':'💪','hårdt mod hårdt':'🔥',
+    'school of hard knocks':'🎓','gym leader jæger':'🎯','elite gym rat':'🏋️',
+    'gym master':'🏆','first blood':'🩸','revenge':'🔄','ubesejret':'🛡️',
+    'scarlet & violet champion':'🔴','scarlet & violet overlord':'👹','scarlet & violet masochist':'💀',
+    'mega evolution champion':'⚡','mega evolution overlord':'👹','mega evolution masochist':'💀',
+    'trofast':'🔥',"alti'-alti'":'💎','gavmild':'🎀','sup sub':'📺',
+    'jeg så det live':'👁️','held i sprøjten':'🍀',
+    'normal':'🏅','hard':'💪','insane':'💀',
   };
 
   function getIcon(title) {
     const lower = title.toLowerCase();
-    for (const [key, icon] of Object.entries(ICON_MAP)) {
+    for (const [key,icon] of Object.entries(ICON_MAP)) {
       if (lower.includes(key)) return icon;
     }
     return '🏆';
   }
 
-  // Gym leader sets
-  const GYM_SV = [
-    {set:'Base Set',name:'S&V Base'},{set:'Paldea Evolved',name:'Gym Leader'},
-    {set:'Obsidian Flames',name:'Gym Leader'},{set:'151',name:'Gym Leader'},
-    {set:'Paradox Rift',name:'Gym Leader'},{set:'Paldean Fates',name:'Gym Leader'},
-    {set:'Temporal Forces',name:'Gym Leader'},{set:'Twilight Masquerade',name:'Gym Leader'},
-    {set:'Shrouded Fable',name:'Gym Leader'},{set:'Stellar Crown',name:'Gym Leader'},
-    {set:'Surging Sparks',name:'Gym Leader'},{set:'Prismatic Evolutions',name:'Gym Leader'},
-    {set:'Journey Together',name:'Gym Leader'},{set:'Destined Rivals',name:'Gym Leader'},
-  ];
-
-  const GYM_ME = [
-    {set:'Base Set',name:'Mega Evo Base'},{set:'Phantasmal Flames',name:'Gym Leader'},
-    {set:'Ascended Heroes',name:'Gym Leader'},{set:'Perfect Order',name:'Gym Leader'},
-    {set:'Black Bolt',name:'Gym Leader'},{set:'White Flare',name:'Gym Leader'},
-  ];
+  // Convert achievement title to pin filename
+  function titleToFilename(title) {
+    return title
+      .toLowerCase()
+      .replace(/[&!':]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim() + '.png';
+  }
 
   // State
   let allAchievements = [];
   let allViewers = [];
   let currentViewer = null;
   let totalViewers = 0;
+  let activeFilter = 'all';
+  let pinFilterOn = false;
 
   // ── FETCH DATA ─────────────────────────────────────────────────
- async function loadData() {
+  async function loadData() {
     if (SHEET_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-      useDummyData();
-      return;
+      useDummyData(); return;
     }
 
     window.handleSheetData = function(data) {
-      if (!data || data.status !== 'ok') {
-        useDummyData();
-        return;
-      }
+      if (!data || data.status !== 'ok') { useDummyData(); return; }
       allAchievements = data.achievements;
-      allViewers = data.viewers;
-      totalViewers = allViewers.length;
+      allViewers      = data.viewers;
+      totalViewers    = allViewers.length;
       renderAll();
     };
 
@@ -380,93 +544,73 @@
     script.src = SHEET_URL + '?action=getAllData&callback=handleSheetData';
     script.onerror = () => useDummyData();
     document.head.appendChild(script);
+
+    setTimeout(() => {
+      if (document.getElementById('loading').style.display !== 'none') {
+        useDummyData();
+      }
+    }, 12000);
   }
 
-  // ── DUMMY DATA (used until URL is configured) ──────────────────
+  // ── DUMMY DATA ─────────────────────────────────────────────────
   function useDummyData() {
     allAchievements = [
-      {col:4,  title:'Ex-ceptionelt!',  desc:'Hit et EX-kort under en pack opening'},
-      {col:5,  title:'Wow den er flot!', desc:'Hit en Illustration Rare'},
-      {col:6,  title:'Yes-SIR!',         desc:'Hit en Special Illustration Rare'},
-      {col:7,  title:'Pink Star!',        desc:'Hit en Ace-Spec Rare (pink star)'},
-      {col:8,  title:'KACHING!',          desc:'Hit en Hyper Rare eller MHR'},
-      {col:9,  title:'Godt valgt!',       desc:'Ram "godpack" i Mystery Envelope'},
-      {col:10, title:'Mystery Jackpot!',  desc:'Hit SIR eller sjældnere fra Mystery Envelope'},
-      {col:11, title:'Bullseye!',         desc:'Hit dagens Bullseye'},
-      {col:12, title:'Sniper!',           desc:'Hit dagens Bullseye to gange'},
-      {col:13, title:'Robin Hood!',       desc:'Hit dagens Bullseye tre gange'},
-      {col:14, title:'Godpack!',          desc:'Hit en godpack eller demi-godpack'},
-      {col:15, title:'Dagens pull!',      desc:'Vind dagens top pull'},
-      {col:16, title:'King-of-the-hill!', desc:'Vind en 8-mands turnering'},
-      {col:17, title:'Winner-winner!',    desc:'Vind en 16-mands turnering'},
-      {col:18, title:'Battle Champion!',  desc:'Vind en Champion Pin (top ved månedsskifte)'},
-      {col:19, title:'Challenger!',       desc:'Udfordre en Gym Leader'},
-      {col:20, title:'Trainer!',          desc:'Besejr en Gym Leader'},
-      {col:21, title:'Rematch!',          desc:'Udfordre en Gym Leader igen efter et nederlag'},
-      {col:22, title:'Ubesejret!',        desc:'Vind 3 Gym Leader battles i træk uden tab'},
-      {col:23, title:'Første Blod!',      desc:'Vær den første til at tjene et bestemt achievement'},
-      {col:24, title:'Trofast!',          desc:'Se 10 streams i træk'},
-      {col:25, title:"Alti'-alti'",       desc:'Se 25 streams i træk'},
-      {col:26, title:'Gavmild!',          desc:'Gift en sub i chatten'},
-      {col:27, title:'Sup Sub!',          desc:'Vær subbed til DonTrio i min. 1 måned'},
+      {col:4,  title:'Ex-ceptionelt!',   desc:'Ram et EX kort',                    hasPin:false, category:'Pack Hits'},
+      {col:5,  title:'Wow den er Flot!', desc:'Ram en illustration rare',           hasPin:false, category:'Pack Hits'},
+      {col:8,  title:'In Don We Trust!', desc:'Ram en hyper rare eller MHR',        hasPin:true,  category:'Pack Hits'},
+      {col:11, title:'Bullseye!',         desc:'Ram Dagens Bullseye',               hasPin:true,  category:'Pack Hits'},
+      {col:16, title:'King of the Hill!', desc:'Vind ugens FFA turnering',          hasPin:true,  category:'PvP'},
+      {col:17, title:'Welcome to the Arena!',desc:'Deltag i en 8 personers turnering',hasPin:false,category:'PvP'},
+      {col:19, title:'The Iron Throne!',  desc:'Hav flest turnerings wins',         hasPin:true,  category:'PvP'},
+      {col:20, title:'Challenger!',       desc:'Kæmp mod en gym leader',            hasPin:false, category:'Gym Leader'},
+      {col:21, title:'Første Win!',       desc:'Vind over en gym leader på NORMAL', hasPin:false, category:'Gym Leader'},
+      {col:33, title:'Scarlet & Violet Champion!',desc:'Vind over alle S&V gym leaders på NORMAL',hasPin:true,category:'Gym Leader'},
+      {col:102,title:'Trofast!',          desc:'Se med på 10 streams i træk',       hasPin:false, category:'Sociale'},
+      {col:104,title:'Gavmild!',          desc:'Gift en sub i chatten',             hasPin:false, category:'Sociale'},
+      {col:107,title:'Held i Sprøjten!',  desc:'Vind dagens random roll',           hasPin:true,  category:'Other'},
     ];
-
     allViewers = [
-      {name:'PokéPeter',   bullseyes:3, tournaments:2, earned:[4,5,6,8,11,12,13,15,16,17,19,20,22,23,24,25,26,27]},
-      {name:'CardKing',    bullseyes:2, tournaments:1, earned:[4,5,6,7,11,12,15,19,20,23,24,25,27]},
-      {name:'DanishDragon',bullseyes:1, tournaments:0, earned:[4,5,7,11,15,19,20,21,23,24,26]},
-      {name:'NordicNinja', bullseyes:0, tournaments:0, earned:[4,5,6,9,19,20,24,26,27]},
-      {name:'BoltBoy',     bullseyes:2, tournaments:0, earned:[4,5,8,11,12,19,20,24,27]},
-      {name:'TrainerTim',  bullseyes:1, tournaments:0, earned:[8,11,15,19,21,24,27]},
-      {name:'PokeProf',    bullseyes:1, tournaments:0, earned:[8,11,19,27]},
-      {name:'SilverSword', bullseyes:0, tournaments:0, earned:[9,11,27]},
-      {name:'RetroRaider', bullseyes:0, tournaments:0, earned:[11]},
-      {name:'PikaPower',   bullseyes:0, tournaments:0, earned:[4]},
+      {name:'GentlemanDon', bullseyes:0, tournaments:0, earned:[]},
+      {name:'Dingodreng1',  bullseyes:0, tournaments:0, earned:[]},
     ];
-
     totalViewers = allViewers.length;
     renderAll();
   }
 
   // ── RENDER ALL ─────────────────────────────────────────────────
   function renderAll() {
-    // Stats bar
-    document.getElementById('s-total').textContent = allAchievements.length;
+    document.getElementById('s-total').textContent   = allAchievements.length;
     document.getElementById('s-viewers').textContent = totalViewers;
-    const totalEarned = allViewers.reduce((sum, v) => sum + v.earned.length, 0);
-    document.getElementById('s-earned').textContent = totalEarned;
+    const totalEarned = allViewers.reduce((s,v) => s + v.earned.length, 0);
+    document.getElementById('s-earned').textContent  = totalEarned;
 
-    // Communal progress (calculated from viewer data)
     const viewersWithAch = allViewers.filter(v => v.earned.length > 0).length;
-    const pct3 = totalViewers > 0 ? Math.round(viewersWithAch / totalViewers * 100) : 0;
-    document.getElementById('cp3-pct').textContent = pct3 + '%';
-    document.getElementById('cp3-bar').style.width = pct3 + '%';
+    const pct3 = totalViewers > 0 ? Math.round(viewersWithAch/totalViewers*100) : 0;
+    document.getElementById('cp3-pct').textContent  = pct3 + '%';
+    document.getElementById('cp3-bar').style.width  = pct3 + '%';
     document.getElementById('cp3-meta').textContent = viewersWithAch + ' / ' + totalViewers + ' viewers';
 
-    // Last updated
-    document.getElementById('last-updated').textContent = 'Sidst opdateret: ' + new Date().toLocaleDateString('da-DK', {day:'numeric',month:'long',year:'numeric'});
+    document.getElementById('last-updated').textContent =
+      'Sidst opdateret: ' + new Date().toLocaleDateString('da-DK',{day:'numeric',month:'long',year:'numeric'});
 
     buildLeaderboard();
-    buildGrid(null);
-    buildGym(GYM_SV, 'gym-sv');
-    buildGym(GYM_ME, 'gym-me');
+    buildCategories();
 
-    // Show main content
-    document.getElementById('loading').style.display = 'none';
+    document.getElementById('loading').style.display    = 'none';
     document.getElementById('main-content').style.display = 'block';
   }
 
   // ── LEADERBOARD ────────────────────────────────────────────────
-function buildLeaderboard() {
+  function buildLeaderboard() {
     const sorted = [...allViewers].sort((a,b) => b.earned.length - a.earned.length).slice(0,10);
-    const max = sorted[0]?.earned.length || 1;
+    const max    = sorted[0]?.earned.length || 1;
     const medals = ['🥇','🥈','🥉'];
 
     document.getElementById('leaderboard').innerHTML = sorted.map((viewer, idx) => {
       const count = viewer.earned.length;
       const icons = viewer.earned.slice(0,5).map(col => {
-        const ach = allAchievements.find(a => a.col === col);
-        return ach ? getIcon(ach.title) : '🏆';
+        const a = allAchievements.find(x => x.col === col);
+        return a ? getIcon(a.title) : '🏆';
       }).join('');
       const cls = idx===0?'top-1':idx===1?'top-2':idx===2?'top-3':'';
       return `<div class="lb-row ${cls}">
@@ -474,44 +618,199 @@ function buildLeaderboard() {
         <div class="lb-rank">${idx<3?medals[idx]:'#'+(idx+1)}</div>
         <div class="lb-name">${viewer.name}</div>
         <div class="lb-badges">${icons}</div>
-        <div class="lb-count"><strong>${count}</strong><span>${count} / ${allAchievements.length} achievements</span></div>
+        <div class="lb-count"><strong>${count}</strong><span>${count} / ${allAchievements.length}</span></div>
       </div>`;
     }).join('');
   }
 
-  // ── ACHIEVEMENT GRID ───────────────────────────────────────────
-  function buildGrid(viewerName) {
-    const viewer = viewerName ? allViewers.find(v => v.name.toLowerCase() === viewerName.toLowerCase()) : null;
+  // ── BUILD CATEGORIES ───────────────────────────────────────────
+  function buildCategories() {
+    const container = document.getElementById('categories-container');
+    container.innerHTML = '';
 
-    document.getElementById('ach-grid').innerHTML = allAchievements.map(ach => {
-      const earned = viewer ? viewer.earned.includes(ach.col) : false;
-      const earners = allViewers.filter(v => v.earned.includes(ach.col));
-      const count = earners.length;
-      const pct = totalViewers > 0 ? Math.round(count / totalViewers * 100) : 0;
-      const icon = getIcon(ach.title);
+    CATEGORY_ORDER.forEach(cat => {
+      const achs = allAchievements.filter(a => a.category === cat);
+      if (achs.length === 0) return;
 
-      return `<div class="ach-card ${earned?'earned':''}" onclick="openModal(${ach.col})">
-        ${earned?'<div class="earned-badge">✓ Earned</div>':''}
-        <span class="ach-icon">${icon}</span>
-        <div class="ach-name">${ach.title}</div>
-        <div class="ach-desc">${ach.desc}</div>
-        <div class="ach-footer">
-          <div class="ach-unlocked"><span>${count}</span> viewer${count!==1?'s':''} · ${pct}%</div>
-          <div class="ach-click-hint">[ klik for detaljer ]</div>
+      const cfg = CATEGORY_CONFIG[cat] || {icon:'🏆', label:cat};
+
+      const section = document.createElement('div');
+      section.className = 'category-section';
+      section.dataset.category = cat;
+
+      section.innerHTML = `
+        <div class="section-header">
+          <div>
+            <div class="section-title">${cfg.icon} ${cfg.label}</div>
+          </div>
+          <div class="section-line"></div>
+          <div class="section-tag" id="cat-count-${cat.replace(/\s/g,'-')}">${achs.length} achievements</div>
         </div>
-      </div>`;
-    }).join('');
+        <div class="achievement-grid" id="grid-${cat.replace(/\s/g,'-')}"></div>
+        <div class="empty-state" id="empty-${cat.replace(/\s/g,'-')}" style="display:none">Ingen achievements matcher dit filter</div>
+      `;
+
+      container.appendChild(section);
+    });
+
+    renderCards();
   }
 
-  // ── GYM GRID ──────────────────────────────────────────────────
-  function buildGym(data, id) {
-    document.getElementById(id).innerHTML = data.map(g =>
-      `<div class="gym-card">
-        <span class="gym-badge-icon">🏅</span>
-        <div class="gym-set">${g.set}</div>
-        <div class="gym-name">${g.name}</div>
-      </div>`
-    ).join('');
+  // ── RENDER CARDS ───────────────────────────────────────────────
+  function renderCards() {
+    const viewer = currentViewer
+      ? allViewers.find(v => v.name.toLowerCase() === currentViewer.toLowerCase())
+      : null;
+
+    CATEGORY_ORDER.forEach(cat => {
+      const gridId  = 'grid-' + cat.replace(/\s/g,'-');
+      const emptyId = 'empty-' + cat.replace(/\s/g,'-');
+      const countId = 'cat-count-' + cat.replace(/\s/g,'-');
+      const grid    = document.getElementById(gridId);
+      const emptyEl = document.getElementById(emptyId);
+      const countEl = document.getElementById(countId);
+      if (!grid) return;
+
+      const achs = allAchievements.filter(a => a.category === cat);
+      let visibleCount = 0;
+      grid.innerHTML = '';
+
+      achs.forEach(ach => {
+        const earned = viewer ? viewer.earned.includes(ach.col) : false;
+        const earners = allViewers.filter(v => v.earned.includes(ach.col));
+        const count   = earners.length;
+        const pct     = totalViewers > 0 ? Math.round(count/totalViewers*100) : 0;
+        const icon    = getIcon(ach.title);
+        const filename = titleToFilename(ach.title);
+
+        // Filter logic
+        let hide = false;
+        if (activeFilter === 'earned'  && (!viewer || !earned)) hide = true;
+        if (activeFilter === 'missing' && (!viewer || earned))  hide = true;
+        if (pinFilterOn && !ach.hasPin) hide = true;
+
+        if (!hide) visibleCount++;
+
+        const card = document.createElement('div');
+        card.className = [
+          'ach-card',
+          earned    ? 'earned'   : '',
+          ach.hasPin? 'has-pin'  : '',
+          hide      ? 'hidden-card':'',
+        ].filter(Boolean).join(' ');
+
+        card.onclick = () => openModal(ach.col);
+
+        card.innerHTML = `
+          <div class="ach-top">
+            <span class="ach-icon">${icon}</span>
+            <div class="ach-badges">
+              ${ach.hasPin ? '<span class="pin-indicator">📌 Pin</span>' : ''}
+              ${earned     ? '<span class="earned-badge">✓ Earned</span>' : ''}
+            </div>
+          </div>
+          <div class="ach-name">${ach.title}</div>
+          <div class="ach-desc">${ach.desc}</div>
+          <div class="ach-footer">
+            <div class="ach-unlocked"><span>${count}</span> viewer${count!==1?'s':''} · ${pct}%</div>
+            <div class="ach-click-hint">[ klik for detaljer ]</div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      if (countEl) countEl.textContent = visibleCount + ' achievements';
+      if (emptyEl) emptyEl.style.display = visibleCount === 0 ? 'block' : 'none';
+    });
+  }
+
+  // ── SEARCH ─────────────────────────────────────────────────────
+  function doSearch() {
+    const val = document.getElementById('hero-input').value.trim();
+    const statusEl = document.getElementById('viewer-status');
+
+    if (!val) {
+      currentViewer = null;
+      clearViewerTag();
+      activeFilter = 'all';
+      setFilterUI('all');
+      renderCards();
+      statusEl.textContent = '';
+      statusEl.className = 'viewer-status';
+      document.getElementById('filter-bar').classList.remove('visible');
+      return;
+    }
+
+    const found = allViewers.find(v => v.name.toLowerCase() === val.toLowerCase());
+
+    if (found) {
+      currentViewer = found.name;
+      statusEl.textContent = '✓ ' + found.name + ' fundet — ' + found.earned.length + ' achievements earned';
+      statusEl.className = 'viewer-status found';
+      showViewerTag(found.name, found.earned.length);
+      activeFilter = 'all';
+      setFilterUI('all');
+      renderCards();
+      document.getElementById('filter-bar').classList.add('visible');
+      // Scroll to achievements
+      setTimeout(() => {
+        document.getElementById('main-content').scrollIntoView({behavior:'smooth'});
+      }, 300);
+    } else {
+      currentViewer = null;
+      clearViewerTag();
+      statusEl.textContent = '✗ "' + val + '" blev ikke fundet — har du skrevet dit navn korrekt?';
+      statusEl.className = 'viewer-status not-found';
+      document.getElementById('filter-bar').classList.remove('visible');
+      renderCards();
+    }
+  }
+
+  function showViewerTag(name, count) {
+    document.getElementById('viewer-tag-wrap').innerHTML = `
+      <div class="viewer-tag">
+        <span>${name} · ${count} earned</span>
+        <button onclick="clearSearch()" title="Ryd søgning">×</button>
+      </div>`;
+  }
+
+  function clearViewerTag() {
+    document.getElementById('viewer-tag-wrap').innerHTML = '';
+  }
+
+  function clearSearch() {
+    document.getElementById('hero-input').value = '';
+    currentViewer = null;
+    clearViewerTag();
+    document.getElementById('viewer-status').textContent = '';
+    document.getElementById('viewer-status').className = 'viewer-status';
+    activeFilter = 'all';
+    pinFilterOn = false;
+    setFilterUI('all');
+    document.getElementById('f-pins').classList.remove('pin-active');
+    document.getElementById('filter-bar').classList.remove('visible');
+    renderCards();
+  }
+
+  // ── FILTERS ────────────────────────────────────────────────────
+  function setFilter(f) {
+    if (!currentViewer && (f === 'earned' || f === 'missing')) return;
+    activeFilter = f;
+    setFilterUI(f);
+    renderCards();
+  }
+
+  function setFilterUI(f) {
+    ['all','earned','missing'].forEach(id => {
+      document.getElementById('f-'+id).classList.toggle('active', id === f);
+    });
+  }
+
+  function togglePinFilter() {
+    pinFilterOn = !pinFilterOn;
+    document.getElementById('f-pins').classList.toggle('pin-active', pinFilterOn);
+    renderCards();
   }
 
   // ── MODAL ──────────────────────────────────────────────────────
@@ -520,41 +819,66 @@ function buildLeaderboard() {
     if (!ach) return;
 
     const earners = allViewers.filter(v => v.earned.includes(col));
-    const count = earners.length;
-    const pct = totalViewers > 0 ? Math.round(count / totalViewers * 100) : 0;
-    const icon = getIcon(ach.title);
+    const count   = earners.length;
+    const pct     = totalViewers > 0 ? Math.round(count/totalViewers*100) : 0;
+    const icon    = getIcon(ach.title);
 
     document.getElementById('m-icon').textContent = icon;
     document.getElementById('m-name').textContent = ach.title;
     document.getElementById('m-desc').textContent = ach.desc;
     document.getElementById('m-count').textContent = count;
-    document.getElementById('m-pct').textContent = pct + '%';
+    document.getElementById('m-pct').textContent   = pct + '%';
 
+    // Top bar color
+    const bar = document.getElementById('modal-top-bar');
+    bar.className = ach.hasPin ? 'modal-top-bar gold-bar' : 'modal-top-bar';
+
+    // Rarity
     const rEl = document.getElementById('m-rarity');
-    if (count === 0) { rEl.textContent = '🔒 Ingen har unlocket dette'; rEl.className = 'modal-rarity rarity-rare'; }
-    else if (count <= 2) { rEl.textContent = '⭐ Ultra Sjælden'; rEl.className = 'modal-rarity rarity-rare'; }
-    else { rEl.textContent = 'Achievement'; rEl.className = 'modal-rarity rarity-common'; }
+    if (count === 0)     { rEl.textContent='🔒 Ingen har unlocket dette'; rEl.className='modal-rarity rarity-rare'; }
+    else if (count <= 2) { rEl.textContent='⭐ Ultra Sjælden';             rEl.className='modal-rarity rarity-rare'; }
+    else                 { rEl.textContent='Achievement';                  rEl.className='modal-rarity rarity-common'; }
 
+    // Pin preview
+    const pinSection = document.getElementById('m-pin-section');
+    if (ach.hasPin) {
+      const filename = titleToFilename(ach.title);
+      pinSection.innerHTML = `
+        <div class="modal-pin-preview">
+          <img src="${PINS_BASE}${filename}" alt="${ach.title} pin"
+               onerror="this.parentElement.innerHTML='<div class=\\'modal-pin-missing\\'>📌 Pin billede kommer snart</div>'">
+          <div class="modal-pin-label">📌 Dette achievement giver en fysisk pin badge</div>
+        </div>`;
+    } else {
+      pinSection.innerHTML = '';
+    }
+
+    // Earners
     document.getElementById('m-earners').innerHTML = count === 0
-      ? '<span class="modal-none">Ingen viewer har unlocket dette endnu — vær den første!</span>'
+      ? '<span class="modal-none">Ingen har unlocket dette endnu — vær den første!</span>'
       : earners.map(v => `<span class="modal-earner-tag">${v.name}</span>`).join('');
 
     document.getElementById('modal-overlay').classList.add('open');
   }
 
-  function closeModal(e) { if (e.target.id === 'modal-overlay') closeModalDirect(); }
+  function closeModal(e) { if (e.target.id==='modal-overlay') closeModalDirect(); }
   function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); }
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+  document.addEventListener('keydown', e => { if (e.key==='Escape') closeModalDirect(); });
 
-  // ── VIEWER FILTER ──────────────────────────────────────────────
-  function filterViewer() {
-    const v = document.getElementById('vsearch').value.trim();
-    currentViewer = v || null;
-    buildGrid(currentViewer);
+  // ── SCROLL / BACK TO TOP ───────────────────────────────────────
+  function scrollToSearch() {
+    document.getElementById('hero-search').scrollIntoView({behavior:'smooth'});
+    setTimeout(() => document.getElementById('hero-input').focus(), 600);
   }
 
-  document.getElementById('vsearch').addEventListener('keydown', e => {
-    if (e.key === 'Enter') filterViewer();
+  window.addEventListener('scroll', () => {
+    const btn = document.getElementById('back-to-search');
+    btn.classList.toggle('visible', window.scrollY > 500);
+  });
+
+  // ── ENTER KEY ─────────────────────────────────────────────────
+  document.getElementById('hero-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
   });
 
   // ── INIT ───────────────────────────────────────────────────────
