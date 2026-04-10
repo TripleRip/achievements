@@ -625,9 +625,7 @@
   let communalData = [];
   let currentViewer = null;
   let totalViewers = 0;
-  let activeFilter = 'all';
-  let pinFilterOn = false;
-  let activeCategory = null;
+  let activeFilter = 'all'; // 'all' | 'earned' | 'missing' | 'pins' | category name
   let achSearchQuery = '';
 
   // ── FETCH DATA ─────────────────────────────────────────────────
@@ -747,7 +745,6 @@
     let sorted, getCount, getSub, getIcons;
 
     if (activeLbTab === 'achievements') {
-      // Shuffle first to randomise ties, then sort descending
       const shuffled = [...allViewers].sort(() => Math.random() - 0.5);
       sorted   = shuffled.sort((a,b) => b.earned.length - a.earned.length).slice(0, ROWS);
       getCount = v => v.earned.length;
@@ -770,14 +767,12 @@
       getIcons = () => '⚔️';
     }
 
-    // Pad to always have exactly ROWS rows so height stays fixed
     while (sorted.length < ROWS) sorted.push(null);
 
     const max = getCount(sorted.find(v => v !== null) || {earned:[], bullseyes:0, tournaments:0}) || 1;
 
     document.getElementById('leaderboard').innerHTML = sorted.map((viewer, idx) => {
       if (!viewer) {
-        // Empty placeholder row — same height, just blank
         return `<div class="lb-row lb-empty">
           <div class="lb-rank" style="color:var(--border)">#${idx+1}</div>
           <div class="lb-name" style="color:var(--border);font-size:14px;letter-spacing:1px">—</div>
@@ -810,10 +805,7 @@
   };
 
   function getGroupKey(key) {
-    // e.g. "twitch_followers_500" → "twitch_followers"
     const parts = key.split('_');
-    // last part is always the number goal, so drop it
-    // but handle two-word prefixes like twitch_subs, twitch_followers, tiktok_followers, discord_members, super_rare, gym_leaders
     parts.pop();
     return parts.join('_');
   }
@@ -823,7 +815,6 @@
     if (!grid) return;
     grid.innerHTML = '';
 
-    // Group tiers by prefix
     const groups = {};
     communalData.forEach(row => {
       const gk = getGroupKey(row.key);
@@ -831,18 +822,15 @@
       groups[gk].push(row);
     });
 
-    // Render in a fixed order matching COMMUNAL_CONFIG
     Object.keys(COMMUNAL_CONFIG).forEach(gk => {
       const tiers = groups[gk];
       if (!tiers || tiers.length === 0) return;
 
-      // Sort tiers by goal ascending
       tiers.sort((a,b) => a.goal - b.goal);
 
       const cfg = COMMUNAL_CONFIG[gk];
-      const current = tiers[0].current; // all tiers share same current value
+      const current = tiers[0].current;
 
-      // Find active tier (first not yet complete)
       let activeTierIdx = tiers.findIndex(t => current < t.goal);
       const allDone = activeTierIdx === -1;
       if (allDone) activeTierIdx = tiers.length - 1;
@@ -850,7 +838,6 @@
       const activeTier = tiers[activeTierIdx];
       const pct = allDone ? 100 : Math.min(100, Math.round(current / activeTier.goal * 100));
 
-      // Build tier pills
       const tierPills = tiers.map((t, i) => {
         let cls = 'communal-tier';
         if (allDone || i < activeTierIdx) cls += ' done';
@@ -922,13 +909,16 @@
 
     const query = achSearchQuery.toLowerCase().trim();
 
+    // Derive pin and category state from the single activeFilter value
+    const pinFilterOn = activeFilter === 'pins';
+    const activeCategory = [...CATEGORY_ORDER, 'Faelles'].includes(activeFilter) ? activeFilter : null;
+
     // Show/hide communal section based on category filter
     const communalSection = document.getElementById('communal-section');
     if (communalSection) {
       communalSection.style.display = (activeCategory === 'Faelles' || !activeCategory) ? '' : 'none';
     }
 
-    // If Faelles-only filter is active, hide all individual category sections
     CATEGORY_ORDER.forEach(cat => {
       const gridId  = 'grid-' + cat.replace(/\s/g,'-');
       const emptyId = 'empty-' + cat.replace(/\s/g,'-');
@@ -1022,7 +1012,7 @@
       currentViewer = null;
       clearViewerTag();
       activeFilter = 'all';
-      setFilterUI('all');
+      updateFilterUI();
       hideViewerFilters();
       renderCards();
       statusEl.textContent = '';
@@ -1039,9 +1029,8 @@
       showViewerTag(found.name, found.earned.length);
       showViewerFilters();
       activeFilter = 'all';
-      setFilterUI('all');
+      updateFilterUI();
       renderCards();
-      // Scroll to achievements
       setTimeout(() => {
         document.getElementById('main-content').scrollIntoView({behavior:'smooth'});
       }, 300);
@@ -1074,34 +1063,46 @@
     document.getElementById('viewer-status').textContent = '';
     document.getElementById('viewer-status').className = 'viewer-status';
     activeFilter = 'all';
-    pinFilterOn = false;
-    activeCategory = null;
     achSearchQuery = '';
     document.getElementById('ach-search').value = '';
     document.getElementById('ach-search-clear').classList.remove('visible');
-    setFilterUI('all');
-    document.getElementById('f-pins').classList.remove('pin-active');
-    [...CATEGORY_ORDER, 'Faelles'].forEach(c => {
-      const btn = document.getElementById('f-cat-' + c);
-      if (btn) btn.classList.remove('cat-active');
-    });
+    updateFilterUI();
     hideViewerFilters();
     renderCards();
   }
 
-  // ── CATEGORY FILTER ────────────────────────────────────────────
-  function setCategory(cat) {
-    if (activeCategory === cat) {
-      activeCategory = null;
-    } else {
-      activeCategory = cat;
-    }
-    const allCats = [...CATEGORY_ORDER, 'Faelles'];
-    allCats.forEach(c => {
-      const btn = document.getElementById('f-cat-' + c);
-      if (btn) btn.classList.toggle('cat-active', activeCategory === c);
-    });
+  // ── FILTERS (all mutually exclusive) ──────────────────────────
+  function setFilter(f) {
+    if (!currentViewer && (f === 'earned' || f === 'missing')) return;
+    activeFilter = f;
+    updateFilterUI();
     renderCards();
+  }
+
+  function setCategory(cat) {
+    activeFilter = (activeFilter === cat) ? 'all' : cat;
+    updateFilterUI();
+    renderCards();
+  }
+
+  function togglePinFilter() {
+    activeFilter = (activeFilter === 'pins') ? 'all' : 'pins';
+    updateFilterUI();
+    renderCards();
+  }
+
+  function updateFilterUI() {
+    // Status filters
+    ['all','earned','missing'].forEach(id => {
+      document.getElementById('f-'+id).classList.toggle('active', activeFilter === id);
+    });
+    // Pin filter
+    document.getElementById('f-pins').classList.toggle('pin-active', activeFilter === 'pins');
+    // Category filters
+    [...CATEGORY_ORDER, 'Faelles'].forEach(c => {
+      const btn = document.getElementById('f-cat-' + c);
+      if (btn) btn.classList.toggle('cat-active', activeFilter === c);
+    });
   }
 
   // ── ACHIEVEMENT SEARCH ─────────────────────────────────────────
@@ -1115,26 +1116,6 @@
     achSearchQuery = '';
     document.getElementById('ach-search').value = '';
     document.getElementById('ach-search-clear').classList.remove('visible');
-    renderCards();
-  }
-
-  // ── FILTERS ────────────────────────────────────────────────────
-  function setFilter(f) {
-    if (!currentViewer && (f === 'earned' || f === 'missing')) return;
-    activeFilter = f;
-    setFilterUI(f);
-    renderCards();
-  }
-
-  function setFilterUI(f) {
-    ['all','earned','missing'].forEach(id => {
-      document.getElementById('f-'+id).classList.toggle('active', id === f);
-    });
-  }
-
-  function togglePinFilter() {
-    pinFilterOn = !pinFilterOn;
-    document.getElementById('f-pins').classList.toggle('pin-active', pinFilterOn);
     renderCards();
   }
 
@@ -1154,17 +1135,14 @@
     document.getElementById('m-count').textContent = count;
     document.getElementById('m-pct').textContent   = pct + '%';
 
-    // Top bar color
     const bar = document.getElementById('modal-top-bar');
     bar.className = ach.hasPin ? 'modal-top-bar gold-bar' : 'modal-top-bar';
 
-    // Rarity
     const rEl = document.getElementById('m-rarity');
     if (count === 0)     { rEl.textContent='🔒 Ingen har unlocket dette'; rEl.className='modal-rarity rarity-rare'; }
     else if (count <= 2) { rEl.textContent='⭐ Ultra Sjælden';             rEl.className='modal-rarity rarity-rare'; }
     else                 { rEl.textContent='Achievement';                  rEl.className='modal-rarity rarity-common'; }
 
-    // Pin preview
     const pinSection = document.getElementById('m-pin-section');
     if (ach.hasPin) {
       const filename = titleToFilename(ach.title);
@@ -1178,7 +1156,6 @@
       pinSection.innerHTML = '';
     }
 
-    // Earners
     document.getElementById('m-earners').innerHTML = count === 0
       ? '<span class="modal-none">Ingen har unlocket dette endnu — vær den første!</span>'
       : earners.map(v => `<span class="modal-earner-tag">${v.name}</span>`).join('');
